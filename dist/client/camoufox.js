@@ -73,10 +73,30 @@ export class CamoufoxGateway {
     async open(url) {
         if (url.origin !== "https://www.greenweez.com")
             throw new ConfigurationError("Le connecteur a refusé une origine non Greenweez.", "Utilisez uniquement les outils Greenweez fournis par ce MCP.");
-        const opened = await this.request("/tabs", { method: "POST", body: JSON.stringify({ url: url.toString(), userId: this.userId, sessionKey: "greenweez" }) });
-        const tabId = typeof opened.tabId === "string" ? opened.tabId : undefined;
-        if (!tabId)
-            throw new ContractChangedError("Camofox n’a pas retourné l’identifiant d’onglet attendu.");
+        let tabId;
+        try {
+            const opened = await this.request("/tabs", { method: "POST", body: JSON.stringify({ url: url.toString(), userId: this.userId, sessionKey: "greenweez" }) });
+            tabId = typeof opened.tabId === "string" ? opened.tabId : undefined;
+            if (!tabId)
+                throw new ContractChangedError("Camofox n’a pas retourné l’identifiant d’onglet attendu.");
+        }
+        catch (error) {
+            if (error instanceof ContractChangedError)
+                throw error;
+            // Un serveur planté ne ferme jamais ses onglets : la session atteint son
+            // plafond (« Maximum tabs per session reached ») et plus aucune instance
+            // ne peut travailler. Plutôt que d'échouer, on adopte un onglet existant
+            // du même utilisateur et on le navigue vers la cible.
+            if (!/maximum tabs/i.test(error instanceof Error ? error.message : String(error)))
+                throw error;
+            const listed = await this.request(`/tabs?userId=${encodeURIComponent(this.userId)}`);
+            const tabs = Array.isArray(listed.tabs) ? listed.tabs : [];
+            const adopted = tabs.map(tab => (typeof tab.tabId === "string" ? tab.tabId : undefined)).find(Boolean);
+            if (!adopted)
+                throw error;
+            await this.request(`/tabs/${encodeURIComponent(adopted)}/navigate`, { method: "POST", body: JSON.stringify({ userId: this.userId, url: url.toString() }) });
+            tabId = adopted;
+        }
         await this.request(`/tabs/${encodeURIComponent(tabId)}/wait`, { method: "POST", body: JSON.stringify({ userId: this.userId, timeout: 30_000, waitForNetwork: true }) });
         return tabId;
     }
