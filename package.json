@@ -1,6 +1,6 @@
 {
   "name": "greenweez-mcp",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Unofficial Greenweez MCP server and CLI with verified cart mutations.",
   "license": "MIT",
   "keywords": [
