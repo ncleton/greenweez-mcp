@@ -93,24 +93,40 @@ function mutationExpression(kind, id, expectedCartTokenHash) {
 function offerExpression(reference) {
     return String.raw `(() => {
     const reference = ${JSON.stringify(reference)};
-    const button = [...document.querySelectorAll('main button')].find(element => /^Ajouter au panier\b/i.test(String(element.innerText || element.textContent || '').trim()));
-    if (!button) return { ok: false, reason: 'add_control_missing' };
+    const allButtons = [...document.querySelectorAll('main button')];
+    // Quand le produit est déjà dans le panier, la boîte d'achat remplace le
+    // bouton « Ajouter au panier » par un compteur dont les boutons portent
+    // les aria-labels « increase »/« decrease » (relevé le 2026-08-06). Chaque
+    // ancre candidate sert uniquement de point d'entrée vers les données
+    // React : le filtre par référence ci-dessous garantit qu'une ancre d'un
+    // autre produit ne peut pas résoudre la mauvaise offre.
+    const anchors = [
+      ...allButtons.filter(element => /^Ajouter au panier\b/i.test(String(element.innerText || element.textContent || '').trim())),
+      ...allButtons.filter(element => String(element.getAttribute('aria-label') || '').trim().toLowerCase() === 'increase'),
+    ];
+    if (!anchors.length) return { ok: false, reason: 'add_control_missing' };
     const candidates = [];
     const seen = new WeakSet();
+    let anchorInStock = false;
     const visit = (value, depth = 0) => {
       if (!value || typeof value !== 'object' || depth > 14 || seen.has(value)) return;
       seen.add(value);
       if (!Array.isArray(value) && value.code === reference && value.mainOffer && value.mainOffer.id != null) candidates.push({ offerId: Number(value.mainOffer.id), quantityAvailable: Number(value.mainOffer.quantityAvailable), inStock: value.inStock === true });
-      if (!Array.isArray(value) && value.variantCode === reference && value.offerId != null) candidates.push({ offerId: Number(value.offerId), quantityAvailable: Number(value.quantityAvailable ?? 0), inStock: !button.disabled });
+      if (!Array.isArray(value) && value.variantCode === reference && value.offerId != null) candidates.push({ offerId: Number(value.offerId), quantityAvailable: Number(value.quantityAvailable ?? 0), inStock: anchorInStock });
       if (Array.isArray(value)) value.forEach(child => visit(child, depth + 1)); else Object.values(value).forEach(child => visit(child, depth + 1));
     };
-    let element = button;
-    for (let level = 0; element && level < 9; level += 1, element = element.parentElement) for (const key of Object.getOwnPropertyNames(element).filter(name => /^__(?:reactProps|reactFiber)\$/.test(name))) visit(element[key]);
+    let anchorDisabled = true;
+    for (const anchor of anchors) {
+      anchorInStock = !anchor.disabled;
+      let element = anchor;
+      for (let level = 0; element && level < 9; level += 1, element = element.parentElement) for (const key of Object.getOwnPropertyNames(element).filter(name => /^__(?:reactProps|reactFiber)\$/.test(name))) visit(element[key]);
+      if (candidates.length) { anchorDisabled = anchor.disabled; break; }
+    }
     const valid = candidates.filter(candidate => Number.isInteger(candidate.offerId) && candidate.offerId > 0 && Number.isInteger(candidate.quantityAvailable) && candidate.quantityAvailable >= 0);
     const ids = [...new Set(valid.map(candidate => candidate.offerId))];
     if (ids.length !== 1) return { ok: false, reason: ids.length ? 'ambiguous_offer' : 'offer_missing' };
     const matching = valid.find(candidate => candidate.offerId === ids[0]);
-    return { ok: true, reference, offerId: ids[0], quantityAvailable: Math.max(...valid.filter(candidate => candidate.offerId === ids[0]).map(candidate => candidate.quantityAvailable)), inStock: !button.disabled && (matching?.inStock === true || matching?.quantityAvailable > 0) };
+    return { ok: true, reference, offerId: ids[0], quantityAvailable: Math.max(...valid.filter(candidate => candidate.offerId === ids[0]).map(candidate => candidate.quantityAvailable)), inStock: !anchorDisabled && (matching?.inStock === true || matching?.quantityAvailable > 0) };
   })()`;
 }
 function stateVersion(cart) {
