@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { realpathSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -23,9 +23,22 @@ function canOnboard(browser: BrowserGateway): browser is BrowserGateway & Greenw
   return "sessionStatus" in browser && typeof browser.sessionStatus === "function" && "loginAndExportSession" in browser && typeof browser.loginAndExportSession === "function" && "openAccountCreation" in browser && typeof browser.openAccountCreation === "function";
 }
 
+// La version annoncée au client MCP suit package.json au lieu d'une constante
+// recopiée à la main, qui avait dérivé de sept versions.
+const { version: packageVersion } = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as { version: string };
+
+// Libère les ressources navigateur d'une instance du serveur : le wizard
+// local éventuel et l'onglet Camoufox partagé des lectures publiques. Chaque
+// fermeture est idempotente et tolère un service déjà arrêté.
+export async function closeBrowserSessions(browser: BrowserGateway, onboarding?: GreenweezOnboarding): Promise<void> {
+  if (onboarding) await onboarding.close().catch(() => undefined);
+  const shared = browser as { closeSharedTab?: () => Promise<void> };
+  if (typeof shared.closeSharedTab === "function") await shared.closeSharedTab().catch(() => undefined);
+}
+
 export function createServer(browser: BrowserGateway = new CamoufoxGateway(), confirmations = new ConfirmationStore(), onboarding = canOnboard(browser) ? new GreenweezOnboarding(browser) : undefined): McpServer {
   const client = new GreenweezClient(browser, confirmations);
-  const server = new McpServer({ name: "greenweez-mcp", version: "0.2.1" }, {
+  const server = new McpServer({ name: "greenweez-mcp", version: packageVersion }, {
     instructions: "Pour toute action nécessitant un compte Greenweez, appelez d’abord connect_greenweez. Cet outil retourne un wizard local avec deux liens directs : connexion à un compte existant et création officielle de compte. Ne demandez jamais de mot de passe, code 2FA, cookie ou jeton dans la conversation.",
   });
   server.registerPrompt("onboard_greenweez", {
@@ -46,10 +59,7 @@ export function createServer(browser: BrowserGateway = new CamoufoxGateway(), co
     } catch (cause) { return error(cause); }
   });
   server.server.onclose = () => {
-    if (onboarding) void onboarding.close().catch(() => undefined);
-    if ("closeSharedTab" in browser && typeof (browser as { closeSharedTab?: () => Promise<void> }).closeSharedTab === "function") {
-      void (browser as { closeSharedTab: () => Promise<void> }).closeSharedTab().catch(() => undefined);
-    }
+    void closeBrowserSessions(browser, onboarding);
   };
   server.registerTool("search_products", {
     title: "Rechercher des produits Greenweez",
@@ -110,8 +120,34 @@ export function createServer(browser: BrowserGateway = new CamoufoxGateway(), co
   return server;
 }
 
+// Le transport stdio du SDK n'écoute que « data » et « error » sur stdin : la
+// fin de flux laissée par un client parent disparu ne déclenche jamais
+// onclose, et le serveur mourait sans libérer son onglet Camoufox partagé. La
+// session saturait alors à son plafond (« Maximum tabs per session reached »)
+// et chaque instance suivante payait une ouverture échouée puis une adoption.
+// On libère donc les sessions navigateur sur SIGTERM, SIGINT et la fin de
+// stdin, avec une sortie forcée si Camoufox ne répond plus à temps.
+const SHUTDOWN_FORCE_EXIT_MS = 5_000;
+
+function installShutdownHandlers(browser: BrowserGateway, onboarding?: GreenweezOnboarding): void {
+  let shuttingDown = false;
+  const shutdown = (): void => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    setTimeout(() => process.exit(0), SHUTDOWN_FORCE_EXIT_MS).unref();
+    void closeBrowserSessions(browser, onboarding).finally(() => process.exit(0));
+  };
+  process.once("SIGTERM", shutdown);
+  process.once("SIGINT", shutdown);
+  process.stdin.once("end", shutdown);
+  process.stdin.once("close", shutdown);
+}
+
 async function main(): Promise<void> {
-  const server = createServer();
+  const browser = new CamoufoxGateway();
+  const onboarding = new GreenweezOnboarding(browser);
+  installShutdownHandlers(browser, onboarding);
+  const server = createServer(browser, undefined, onboarding);
   await server.connect(new StdioServerTransport());
 }
 

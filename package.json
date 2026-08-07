@@ -1,6 +1,6 @@
 {
   "name": "greenweez-mcp",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Unofficial Greenweez MCP server and CLI with verified cart mutations.",
   "license": "MIT",
   "keywords": [
@@ -61,7 +61,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
-    "greenweez-mcp": "github:ncleton-petitmaker/greenweez-mcp#v0.2.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
