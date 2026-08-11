@@ -129,6 +129,12 @@ async function runShutdownScenario(trigger: (child: ChildProcess) => void): Prom
     const searchResponse = await waitFor(() => reader.messages.find((message) => message.id === 2), "la réponse search_products", context);
     assert.equal((searchResponse.result as JsonRecord | undefined)?.isError, undefined, `search_products a échoué : ${JSON.stringify(searchResponse)}`);
     assert.ok(fixture.calls.some((call) => call.method === "POST" && call.path === "/tabs"), "l'onglet partagé n'a pas été ouvert par la recherche");
+    const waits = fixture.calls.filter((call) => call.method === "POST" && call.path.endsWith("/wait"));
+    assert.ok(waits.length > 0, "la recherche n'a pas attendu que le document Greenweez soit prêt");
+    assert.ok(
+      waits.every((call) => call.body?.waitForNetwork === false),
+      "le connecteur ne doit pas attendre le réseau inactif : Greenweez garde des requêtes d'analytics ouvertes après le chargement du document",
+    );
 
     const isSharedTabClose = (call: RecordedCall): boolean =>
       call.method === "DELETE" && call.path === `/tabs/${FIXTURE_TAB_ID}` && call.body?.userId === FIXTURE_USER_ID;

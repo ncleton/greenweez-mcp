@@ -70,6 +70,16 @@ export class CamoufoxGateway {
     async request(path, init = {}) {
         return asRecord(await this.requestValue(path, init));
     }
+    async waitForDocument(tabId) {
+        // Greenweez maintient des requêtes d'analytics ouvertes après que le DOM
+        // est prêt. Attendre l'inactivité réseau bloque alors lecture du panier et
+        // recherche sans apporter de garantie supplémentaire : chaque appelant
+        // vérifie ensuite le contrat précis de la page avec evaluate().
+        await this.request(`/tabs/${encodeURIComponent(tabId)}/wait`, {
+            method: "POST",
+            body: JSON.stringify({ userId: this.userId, timeout: 30_000, waitForNetwork: false }),
+        });
+    }
     async open(url) {
         if (url.origin !== "https://www.greenweez.com")
             throw new ConfigurationError("Le connecteur a refusé une origine non Greenweez.", "Utilisez uniquement les outils Greenweez fournis par ce MCP.");
@@ -97,7 +107,7 @@ export class CamoufoxGateway {
             await this.request(`/tabs/${encodeURIComponent(adopted)}/navigate`, { method: "POST", body: JSON.stringify({ userId: this.userId, url: url.toString() }) });
             tabId = adopted;
         }
-        await this.request(`/tabs/${encodeURIComponent(tabId)}/wait`, { method: "POST", body: JSON.stringify({ userId: this.userId, timeout: 30_000, waitForNetwork: true }) });
+        await this.waitForDocument(tabId);
         return tabId;
     }
     async close(tabId) {
@@ -163,7 +173,7 @@ export class CamoufoxGateway {
         try {
             await this.request(`/sessions/${encodeURIComponent(this.userId)}/cookies`, { method: "POST", body: JSON.stringify({ cookies, tabId }) });
             await this.request(`/tabs/${encodeURIComponent(tabId)}/navigate`, { method: "POST", body: JSON.stringify({ userId: this.userId, url: "https://www.greenweez.com/mon-compte" }) });
-            await this.request(`/tabs/${encodeURIComponent(tabId)}/wait`, { method: "POST", body: JSON.stringify({ userId: this.userId, timeout: 30_000, waitForNetwork: true }) });
+            await this.waitForDocument(tabId);
             const connected = await this.evaluate(tabId, `(() => { const text=String(document.body.innerText||''); return location.pathname.startsWith('/mon-compte') && !/me connecter|connexion à votre compte/i.test(text); })()`);
             if (connected !== true)
                 throw new ConnectionError("La session Greenweez importée a expiré ou a été révoquée.", "Reconnectez-vous localement une fois, puis créez un nouveau bundle chiffré.");
@@ -192,7 +202,7 @@ export class CamoufoxGateway {
             const tabId = this.sharedTabId;
             try {
                 await this.request(`/tabs/${encodeURIComponent(tabId)}/navigate`, { method: "POST", body: JSON.stringify({ userId: this.userId, url: url.toString() }) });
-                await this.request(`/tabs/${encodeURIComponent(tabId)}/wait`, { method: "POST", body: JSON.stringify({ userId: this.userId, timeout: 30_000, waitForNetwork: true }) });
+                await this.waitForDocument(tabId);
                 return tabId;
             }
             catch {

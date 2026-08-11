@@ -13,6 +13,7 @@ export declare class CamoufoxGateway implements BrowserGateway, GreenweezOnboard
     constructor(environment?: NodeJS.ProcessEnv);
     private requestValue;
     private request;
+    private waitForDocument;
     private open;
     private close;
     private evaluate;
