@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "--package=github:ncleton-petitmaker/greenweez-mcp#v0.2.1",
+        "--package=github:ncleton/greenweez-mcp#v0.2.1",
         "greenweez-mcp"
       ]
     }

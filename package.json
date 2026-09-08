@@ -13,12 +13,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ncleton-petitmaker/greenweez-mcp.git"
+    "url": "https://github.com/ncleton/greenweez-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/ncleton-petitmaker/greenweez-mcp/security/advisories/new"
+    "url": "https://github.com/ncleton/greenweez-mcp/security/advisories/new"
   },
-  "homepage": "https://github.com/ncleton-petitmaker/greenweez-mcp#readme",
+  "homepage": "https://github.com/ncleton/greenweez-mcp#readme",
   "main": "dist/client/greenweez.js",
   "types": "dist/client/greenweez.d.ts",
   "exports": {
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
-    "greenweez-mcp": "github:ncleton-petitmaker/greenweez-mcp#v0.2.4",
+    "greenweez-mcp": "github:ncleton/greenweez-mcp#v0.2.4",
     "zod": "4.4.3"
   },
   "devDependencies": {

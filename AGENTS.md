@@ -12,22 +12,22 @@ Ce registre est le point d’entrée de cet agent pour les MCP de l’organisati
 
 | MCP | Dépôt / source | Statut de gestion |
 | --- | --- | --- |
-| Greenweez MCP | [GitHub](https://github.com/ncleton-petitmaker/greenweez-mcp) · [checkout local](./README.md) | Serveur et CLI Greenweez ; publication GitHub sur `main`, releases par tags versionnés. |
+| Greenweez MCP | [GitHub](https://github.com/ncleton/greenweez-mcp) · [checkout local](./README.md) | Serveur et CLI Greenweez ; publication GitHub sur `main`, releases par tags versionnés. |
 | Vegetal Food MCP | [checkout local](./vegetal-food-mcp/README.md) | Serveur et CLI pour le catalogue public Vegetal Food ; dépôt GitHub à créer avant publication. |
-| Leclerc Drive MCP | [GitHub](https://github.com/ncleton-petitmaker/leclerc-drive-mcp) | Serveur et CLI web adossés à une session persistante isolée par utilisateur ; onboarding, catalogue, fiches et panier sécurisé ; publication GitHub sur `main`, release `v0.1.1`. |
-| Carrefour Drive MCP | [GitHub](https://github.com/ncleton-petitmaker/carrefour-drive-mcp) · [checkout local géré](./carrefour-drive-mcp/README.md) | Serveur MCP et CLI web Carrefour Drive détenus dans ce workspace : profil Chrome dédié et isolé, onboarding, session, catalogue, fiches, panier et ajout confirmé avec réconciliation. Source de vérité partagée : GitHub `main`, tag publié `v0.2.0`. Aucun téléphone ni backend mobile. |
-| OVS MCP | [GitHub](https://github.com/ncleton-petitmaker/ovs-mcp) · [checkout local](./ovs-mcp/README.md) | Serveur et CLI Official Vegan Shop ; clone de travail géré ici sur `main`. |
-| Freepik MCP Alpic | [GitHub](https://github.com/ncleton-petitmaker/freepik-mcp-alpic) | Serveur MCP Python détenu par l’organisation. |
-| Freepik MCP | [GitHub](https://github.com/ncleton-petitmaker/freepik-mcp) | Fork du serveur Freepik : maintenir séparément de l’amont et documenter toute divergence. |
+| Leclerc Drive MCP | [GitHub](https://github.com/ncleton/leclerc-drive-mcp) | Serveur et CLI web adossés à une session persistante isolée par utilisateur ; onboarding, catalogue, fiches et panier sécurisé ; publication GitHub sur `main`, release `v0.1.1`. |
+| Carrefour Drive MCP | [GitHub](https://github.com/ncleton/carrefour-drive-mcp) · [checkout local géré](./carrefour-drive-mcp/README.md) | Serveur MCP et CLI web Carrefour Drive détenus dans ce workspace : profil Chrome dédié et isolé, onboarding, session, catalogue, fiches, panier et ajout confirmé avec réconciliation. Source de vérité partagée : GitHub `main`, tag publié `v0.2.0`. Aucun téléphone ni backend mobile. |
+| OVS MCP | [GitHub](https://github.com/ncleton/ovs-mcp) · [checkout local](./ovs-mcp/README.md) | Serveur et CLI Official Vegan Shop ; clone de travail géré ici sur `main`. |
+| Freepik MCP Alpic | [GitHub](https://github.com/ncleton/freepik-mcp-alpic) | Serveur MCP Python détenu par l’organisation. |
+| Freepik MCP | [GitHub](https://github.com/ncleton/freepik-mcp) | Fork du serveur Freepik : maintenir séparément de l’amont et documenter toute divergence. |
 
 ### Serveurs MCP intégrés à des produits
 
 | Produit | Dépôt / chemin du serveur | Statut de gestion |
 | --- | --- | --- |
-| CRM Petitmaker | [GitHub](https://github.com/ncleton-petitmaker/crmpetitmaker/tree/main/mcp-server) | Paquet interne `@petitmaker/mcp-server`. |
-| CRM Maison / Marcelle | [GitHub](https://github.com/ncleton-petitmaker/crmmaison/tree/main/mcp-server) | Paquet interne `@marcelle/mcp-server`. |
-| CRMClaw | [GitHub](https://github.com/ncleton-petitmaker/crmclaw/tree/main/mcp-server) | Paquet interne `@petitmaker/mcp-server`, maintenu avec le produit CRMClaw. |
-| Yaka Bridge | [GitHub](https://github.com/ncleton-petitmaker/yaka-bridge) | Plateforme qui intègre des workflows MCP ; ce n’est pas un serveur MCP autonome à publier depuis ce workspace. |
+| CRM Petitmaker | [GitHub](https://github.com/ncleton/crmpetitmaker/tree/main/mcp-server) | Paquet interne `@petitmaker/mcp-server`. |
+| CRM Maison / Marcelle | [GitHub](https://github.com/ncleton/crmmaison/tree/main/mcp-server) | Paquet interne `@marcelle/mcp-server`. |
+| CRMClaw | [GitHub](https://github.com/ncleton/crmclaw/tree/main/mcp-server) | Paquet interne `@petitmaker/mcp-server`, maintenu avec le produit CRMClaw. |
+| Yaka Bridge | [GitHub](https://github.com/ncleton/yaka-bridge) | Plateforme qui intègre des workflows MCP ; ce n’est pas un serveur MCP autonome à publier depuis ce workspace. |
 
 Avant toute modification d’un de ces dépôts, ouvrir ses propres `AGENTS.md` et travailler dans son checkout dédié. Pour OVS, le checkout géré ici est `./ovs-mcp`.
 

@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ncleton-petitmaker/greenweez-mcp/actions/workflows/ci.yml"><img src="https://github.com/ncleton-petitmaker/greenweez-mcp/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://github.com/ncleton-petitmaker/greenweez-mcp/releases"><img src="https://img.shields.io/github/v/release/ncleton-petitmaker/greenweez-mcp?display_name=tag&sort=semver" alt="GitHub release" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/ncleton-petitmaker/greenweez-mcp" alt="MIT License" /></a>
+  <a href="https://github.com/ncleton/greenweez-mcp/actions/workflows/ci.yml"><img src="https://github.com/ncleton/greenweez-mcp/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/ncleton/greenweez-mcp/releases"><img src="https://img.shields.io/github/v/release/ncleton/greenweez-mcp?display_name=tag&sort=semver" alt="GitHub release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/ncleton/greenweez-mcp" alt="MIT License" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D22.12.0-339933?logo=nodedotjs&logoColor=white" alt="Node.js 22.12+" /></a>
   <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-stdio-10a37f" alt="Model Context Protocol over stdio" /></a>
 </p>
@@ -37,7 +37,7 @@ Prérequis : Node.js 22.12 ou supérieur, ainsi qu’un service Camofox local su
       "command": "npx",
       "args": [
         "-y",
-        "--package=github:ncleton-petitmaker/greenweez-mcp#v0.2.1",
+        "--package=github:ncleton/greenweez-mcp#v0.2.1",
         "greenweez-mcp"
       ]
     }
@@ -109,8 +109,8 @@ Les confirmations sont aléatoires, à usage unique, valables deux minutes et co
 Le même client métier et le même gestionnaire de session sont disponibles en CLI :
 
 ```sh
-npx -y --package=github:ncleton-petitmaker/greenweez-mcp#v0.2.1 greenweez search "pâte à tartiner" 1
-npx -y --package=github:ncleton-petitmaker/greenweez-mcp#v0.2.1 greenweez cart get
+npx -y --package=github:ncleton/greenweez-mcp#v0.2.1 greenweez search "pâte à tartiner" 1
+npx -y --package=github:ncleton/greenweez-mcp#v0.2.1 greenweez cart get
 ```
 
 Le CLI et le serveur MCP utilisent exactement le même client métier et le même registre privé de confirmations. Le connecteur ne propose ni passage de commande, ni validation de livraison, ni paiement.
@@ -120,7 +120,7 @@ Si la structure du site, Camofox ou l’accès est modifié, le connecteur écho
 ## Développement et publication
 
 ```sh
-git clone https://github.com/ncleton-petitmaker/greenweez-mcp.git
+git clone https://github.com/ncleton/greenweez-mcp.git
 cd greenweez-mcp
 npm ci
 npm run verify
@@ -130,6 +130,6 @@ La branche `main` est protégée par la CI : types, tests MCP, audit de confiden
 
 ## Sécurité et support
 
-Consultez [SECURITY.md](SECURITY.md) pour signaler une vulnérabilité en privé. Pour une question d’utilisation ou une amélioration, ouvrez une [discussion GitHub](https://github.com/ncleton-petitmaker/greenweez-mcp/discussions) ou une issue sans aucune donnée de compte.
+Consultez [SECURITY.md](SECURITY.md) pour signaler une vulnérabilité en privé. Pour une question d’utilisation ou une amélioration, ouvrez une [discussion GitHub](https://github.com/ncleton/greenweez-mcp/discussions) ou une issue sans aucune donnée de compte.
 
 Licence [MIT](LICENSE).
