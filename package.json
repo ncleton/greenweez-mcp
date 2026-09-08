@@ -62,7 +62,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",
     "greenweez-mcp": "github:ncleton/greenweez-mcp#v0.2.4",
-    "zod": "4.4.3"
+    "zod": "4.5.4"
   },
   "devDependencies": {
     "@types/node": "25.2.3",
